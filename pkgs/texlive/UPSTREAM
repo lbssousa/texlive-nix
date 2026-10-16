@@ -1,0 +1,2 @@
+# Origin of the vendored files in this directory
+nixpkgs NixOS/nixpkgs fa465a5e1bf7a5d2a5aee6901b8cdfdbb6fd6db0 pkgs/tools/typesetting/tex/texlive
