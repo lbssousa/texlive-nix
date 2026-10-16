@@ -59,12 +59,12 @@ Packages are fixed-output derivations, so the binary cache serves them even with
 
 ### Binary cache
 
-CI pushes everything to Cachix (`lbssousa-texlive`). Use it with:
+CI pushes everything to Cachix (`lbssousa-texlive`). The flake declares it in `nixConfig`, so `nix build github:lbssousa/texlive-nix#…` offers to use it. For NixOS or a flake that consumes this one:
 
 ```nix
 nix.settings = {
   extra-substituters = [ "https://lbssousa-texlive.cachix.org" ];
-  extra-trusted-public-keys = [ "lbssousa-texlive.cachix.org-1:<key from app.cachix.org>" ];
+  extra-trusted-public-keys = [ "lbssousa-texlive.cachix.org-1:uRToqIsCIAfEOw+7I9q2CGyL5BOLJTFtBf1bJR/ut9Q=" ];
 };
 ```
 

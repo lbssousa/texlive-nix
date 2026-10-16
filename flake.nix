@@ -1,6 +1,11 @@
 {
   description = "The latest TeX Live for Nix, ahead of nixpkgs, with the nixpkgs texlive API";
 
+  nixConfig = {
+    extra-substituters = [ "https://lbssousa-texlive.cachix.org" ];
+    extra-trusted-public-keys = [ "lbssousa-texlive.cachix.org-1:uRToqIsCIAfEOw+7I9q2CGyL5BOLJTFtBf1bJR/ut9Q=" ];
+  };
+
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs =
