@@ -68,6 +68,18 @@ log "Regenerating tlpdb.nix"
 out=$(nix build --no-link --print-out-paths ".#texlive.tlpdb.nix")
 install -m 644 "$out" pkgs/texlive/tlpdb.nix
 
+log "Matching LuaMetaTeX to the ConTeXt sources of the snapshot"
+src=$(nix build --no-link --print-out-paths ".#texlive.pkgs.context.texsource")/source/context/base
+zip=$(ls "$src"/luametatex-*.src.zip)
+level=${zip##*/luametatex-}
+level=${level%.src.zip}
+lmtx_version=$(nix shell nixpkgs#unzip -c unzip -p "$zip" '*luametatex.h' |
+  sed -nE 's/^# *define luametatex_version_string +"([^"]+)".*/\1/p')
+sed -i -E "/^  context =/,/^    in/{
+  s/^(      version = )\"[^\"]*\";/\1\"$lmtx_version\";/
+  s/^(      level = )\"[^\"]*\";/\1\"$level\";/
+}" pkgs/texlive/bin.nix
+
 if [[ -n $skip_hashes ]]; then
   exit 0
 fi

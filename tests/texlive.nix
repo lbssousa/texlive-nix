@@ -488,6 +488,8 @@ rec {
         "kpsewhere"
         "latex-git-log"
         "ltxfileinfo"
+        # exits with 1 even for --version/--help
+        "make-paper-tarball"
         "mendex"
         "pdflatexpicscale"
         "perltex"
@@ -537,6 +539,7 @@ rec {
         "latex2man"
         "latex-git-log"
         "listings-ext.sh"
+        "make-paper-tarball"
         "psbook"
         "psnup"
         "psresize"

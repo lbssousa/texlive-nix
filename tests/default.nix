@@ -70,7 +70,7 @@ let
         name = "${drv.pname}-${toString i}";
         inherit path;
       }) (allOutputs drv)
-    ) (lib.attrValues latestUnfree.texliveLatestPackages)
+    ) (lib.filter lib.isDerivation (lib.attrValues latestUnfree.texliveLatestPackages))
   );
 in
 lib.mapAttrs' (name: lib.nameValuePair "texlive-${name}") (flatten "" upstreamTests)

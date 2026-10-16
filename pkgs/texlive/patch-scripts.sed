@@ -14,6 +14,9 @@
     :add-script-folder-path-after
     p;z;N;s/\n//
     :add-script-folder-path
+    # texlive-nix: `from __future__` imports must stay at the top
+    /^\(#.*\)\?$/b add-script-folder-path-after
+    /^from __future__ /b add-script-folder-path-after
     s!^!import sys; sys.path.insert(0,'@scriptsFolder@')\n!
   }
 

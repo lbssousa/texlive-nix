@@ -556,8 +556,8 @@ rec {
   # https://github.com/gucci-on-fleek/context-packaging
   context =
     let
-      version = "2.11.09";
-      level = "20260705";
+      version = "2.11.10";
+      level = "20260909";
     in
     stdenv.mkDerivation {
       pname = "luametatex";
