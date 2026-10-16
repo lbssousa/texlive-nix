@@ -60,6 +60,20 @@ in
 lib.recursiveUpdate orig rec {
   #### overrides of texlive.tlpdb
 
+  #### Manual license adjustments
+
+  # The package includes university logos under a license that explicitly
+  # permits redistribution in the package, but no modification
+  # See license: https://mirrors.ctan.org/macros/latex/contrib/utbmciad-report/logos/LICENSE.logos
+  utbmciad-report.license = (lib.remove "unfree" orig.utbmciad-report.license) ++ [
+    "unfreeRedistributable"
+  ];
+  # GPL3 with font exception clause
+  newcomputermodern.license = (lib.remove "gpl3+fe" orig.newcomputermodern.license) ++ [
+    "gpl3Plus"
+    "fontException"
+  ];
+
   #### nonstandard script folders
   context-legacy.scriptsFolder = "context/ruby";
   cyrillic-bin.scriptsFolder = "texlive-extra";
@@ -252,6 +266,8 @@ lib.recursiveUpdate orig rec {
   # xindy is broken on some platforms unfortunately
   xindy.binfiles =
     if bin ? xindy then lib.subtractLists [ "xindy.mem" "xindy.run" ] orig.xindy.binfiles else [ ];
+  # known bug that hilatex is not available: https://tug.org/texlive/bugs.html
+  hitex.binfiles = lib.remove "hilatex" orig.hitex.binfiles;
 
   #### additional symlinks
   cluttex.binlinks = {
@@ -560,6 +576,9 @@ lib.recursiveUpdate orig rec {
   # add them elsewhere so that collections cover all packages
   collection-metapost.deps = orig.collection-metapost.deps ++ [ "metafont" ];
   collection-plaingeneric.deps = orig.collection-plaingeneric.deps ++ [ "xdvi" ];
+
+  # xetex dependency dropped, but xetex engine format still around
+  csplain.deps = orig.csplain.deps ++ [ "xetex" ];
 
   #### misc
 

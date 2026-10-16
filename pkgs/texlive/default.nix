@@ -139,12 +139,12 @@ let
   version = {
     # day of the snapshot being taken
     year = "2026";
-    month = "03";
-    day = "01";
+    month = "07";
+    day = "27";
     # TeX Live version
-    texliveYear = 2025;
+    texliveYear = 2026;
     # final (historic) release or snapshot
-    final = true;
+    final = false;
   };
 
   # The tarballs on CTAN mirrors for the current release are constantly
@@ -181,7 +181,7 @@ let
         # use last mirror for daily snapshots as texlive.tlpdb.xz changes every day
         # TODO make this less hacky
         (if version.final then mirrors else [ (lib.last mirrors) ]);
-    hash = "sha256-Vt8DjpBwo9WH7s613vPxVLLKzM7zbUKVu0ngYYl3w0o=";
+    hash = "sha256-7P9cnbSZcWmVW2qlKZkpxr95VI/FllLZ2BDz0xdppBQ=";
   };
 
   tlpdbNix =
@@ -192,7 +192,7 @@ let
         nativeBuildInputs = [ nixfmt ];
       }
       ''
-        xzcat "$tlpdbxz" | sed -rn -f "$tl2nix" | uniq | nixfmt > "$out"
+        xzcat "$tlpdbxz" | sed -rn -f "$tl2nix" | uniq | nixfmt - > "$out"
       '';
 
   # map: name -> fixed-output hash
@@ -356,6 +356,7 @@ let
       knuth
       lgpl21
       lppl1
+      lppl12
       lppl13c
       mit
       ofl
@@ -397,6 +398,7 @@ let
       lgpl2
       lgpl21
       lppl1
+      lppl12
       lppl13c
       mit
       ofl
@@ -423,6 +425,7 @@ let
       cc0
       eupl12
       fdl13Only
+      fontException
       free
       gfsl
       gpl1Only
@@ -436,16 +439,20 @@ let
       lgpl21
       lgpl3
       lppl1
+      lppl11
       lppl12
       lppl13a
+      lppl13b
       lppl13c
       mit
       ofl
       publicDomain
+      unfreeRedistributable
       x11
     ];
     scheme-gust = [
       artistic1-cl8
+      artistic2
       asl20
       bsd2
       bsd3
@@ -465,7 +472,9 @@ let
       lgpl2
       lgpl21
       lppl1
+      lppl11
       lppl12
+      lppl13a
       lppl13c
       mit
       ofl
@@ -478,6 +487,7 @@ let
     ];
     scheme-medium = [
       artistic1-cl8
+      artistic2
       asl20
       bsd0
       bsd2
@@ -501,8 +511,10 @@ let
       lgpl21
       lgpl3
       lppl1
+      lppl11
       lppl12
       lppl13a
+      lppl13b
       lppl13c
       mit
       ofl
@@ -523,7 +535,9 @@ let
       publicDomain
     ];
     scheme-small = [
+      artistic2
       asl20
+      bsd3
       cc-by-40
       cc-by-sa-40
       cc0
@@ -539,6 +553,7 @@ let
       lgpl2
       lgpl21
       lppl1
+      lppl11
       lppl12
       lppl13c
       mit
@@ -573,8 +588,10 @@ let
       lgpl21
       lgpl3
       lppl1
+      lppl11
       lppl12
       lppl13a
+      lppl13b
       lppl13c
       mit
       ofl

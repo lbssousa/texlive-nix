@@ -1,12 +1,20 @@
 1{
   /python/{
-    N;
-    # add script folder to path, unless we interfere with a docstring
-    /\nr"""/b skip-python-path-patch
-    # skip encoding declarations
-    /\n\s*#.*coding[=:]\s*[-a-zA-Z0-9_.]/N
-    s!\n\([^\n]*\)$!\nimport sys; sys.path.insert(0,'@scriptsFolder@')\n\1!
-    :skip-python-path-patch
+    # add script folder to path after a potential doc string
+    :skip-empty-or-comment
+    p;z;N;s/\n//
+    /^\(#.*\)\?$/b skip-empty-or-comment
+    /^r\?\('''\|"""\).*\('''\|"""\)$/b add-script-folder-path-after
+    /^r\?\('''\|"""\)/b skip-doc-string
+    b add-script-folder-path
+    :skip-doc-string
+    p;z;N;s/\n//
+    /\('''\|"""\)$/b add-script-folder-path-after
+    b skip-doc-string
+    :add-script-folder-path-after
+    p;z;N;s/\n//
+    :add-script-folder-path
+    s!^!import sys; sys.path.insert(0,'@scriptsFolder@')\n!
   }
 
   /^#!.*perl/{

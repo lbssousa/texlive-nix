@@ -78,9 +78,11 @@ $a}
       s/"lgpl"/"lgpl2"/g
       s/"lgpl2\.1"/"lgpl21"/g
       s/"lppl"/"lppl13c"/g      # not used consistently, sometimes "lppl" refers to an older version of the license
+      s/"lppl1\.1"/"lppl11"/g
       s/"lppl1\.2"/"lppl12"/g
       s/"lppl1\.3"/"lppl13c"/g  # If a work refers to LPPL 1.3 as its license, this is interpreted as the latest version of the 1.3 license (https://www.latex-project.org/lppl/)
       s/"lppl1\.3a"/"lppl13a"/g
+      s/"lppl1\.3b"/"lppl13b"/g
       s/"lppl1\.3c"/"lppl13c"/g
       s/"other-free"/"free"/g
       s/"other-nonfree"/"unfree"/g
