@@ -134,7 +134,8 @@ let
           ;
       };
     in
-    overrides tlpdb;
+    # texlive-nix: local adjustments, see local-overrides.nix
+    import ./local-overrides.nix { inherit lib; } (overrides tlpdb);
 
   version = {
     # day of the snapshot being taken
@@ -447,7 +448,6 @@ let
       mit
       ofl
       publicDomain
-      unfreeRedistributable
       x11
     ];
     scheme-gust = [
