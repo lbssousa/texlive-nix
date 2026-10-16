@@ -1,0 +1,52 @@
+name: Update TeX Live snapshot
+
+on:
+  schedule:
+    - cron: "0 4 2 * *" # monthly
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Snapshot day (YYYY-MM-DD, default: yesterday)"
+        required: false
+      year:
+        description: "Switch to another TeX Live year (annual cycle)"
+        required: false
+      freeze:
+        description: "Use the final (historic) tlnet of the current year"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: lbssousa-texlive
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Update snapshot
+        id: update
+        run: |
+          args=()
+          [[ -n "${{ inputs.year }}" ]] && args+=(--year "${{ inputs.year }}")
+          [[ "${{ inputs.freeze }}" == true ]] && args+=(--freeze)
+          scripts/update-snapshot.sh "${args[@]}" ${{ inputs.date }}
+          echo "version=$(nix eval --raw --impure --expr 'let c = (import ./pkgs/texlive/tlpdb.nix)."00texlive.config"; in "${toString c.year}.r${toString c.revision}"')" >> "$GITHUB_OUTPUT"
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update/snapshot
+          title: "texlive: update to ${{ steps.update.outputs.version }}"
+          commit-message: "texlive: update to ${{ steps.update.outputs.version }}"
+          body-path: NEW-PACKAGES.md
+          labels: snapshot
+          delete-branch: true

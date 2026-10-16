@@ -1,0 +1,61 @@
+name: Sync with nixpkgs
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # weekly
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - name: Merge nixpkgs changes into the vendored files
+        id: sync
+        run: |
+          if scripts/sync-upstream.sh; then
+            echo "conflicts=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "conflicts=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update/nixpkgs-sync
+          title: "texlive: sync with nixpkgs${{ steps.sync.outputs.conflicts == 'true' && ' (CONFLICTS)' || '' }}"
+          commit-message: "texlive: sync vendored files with nixpkgs"
+          body: |
+            Three-way merge of `pkgs/tools/typesetting/tex/texlive` from nixpkgs (see `pkgs/texlive/UPSTREAM`).
+            ${{ steps.sync.outputs.conflicts == 'true' && 'There are merge conflicts: resolve the markers before merging.' || '' }}
+          draft: ${{ steps.sync.outputs.conflicts == 'true' }}
+          delete-branch: true
+
+  cycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - name: Check the yearly TeX Live cycle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! report=$(scripts/check-cycle.sh); then
+            title="TeX Live yearly cycle: action needed"
+            if ! gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number' | grep -q .; then
+              gh issue create --title "$title" --body "$(printf '%s\n\nSee the \"Yearly cycle\" section of the README.\n' "$report")"
+            fi
+          fi
+
+  flake-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/update-flake-lock@v27
+        with:
+          pr-title: "flake.lock: update"

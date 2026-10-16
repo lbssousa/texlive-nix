@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check --no-build --all-systems
+
+  build:
+    needs: eval
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            runner: ubuntu-latest
+            targets: >-
+              .#texlive.bin.core .#texlive.bin.core-big
+              .#texliveSmall .#texliveMedium .#texliveFull .#texliveConTeXt
+          - system: aarch64-linux
+            runner: ubuntu-24.04-arm
+            targets: .#texlive.bin.core .#texliveSmall .#texliveMedium
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: lbssousa-texlive
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Build schemes
+        run: nix build --no-link -L ${{ matrix.targets }}
+      - name: Test suite and completeness
+        run: |
+          checks=$(nix eval --json .#checks.${{ matrix.system }} --apply builtins.attrNames |
+            jq -r '.[] | select(. != "allPackages")')
+          nix build --no-link -L --keep-going $(printf '.#checks.${{ matrix.system }}.%s ' $checks)
+
+  all-packages:
+    # every individual package, including the ones outside of any scheme
+    needs: build
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'snapshot')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: lbssousa-texlive
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - run: nix build --no-link -L --keep-going .#checks.x86_64-linux.allPackages
