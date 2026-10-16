@@ -41,11 +41,12 @@
             }
           );
         in
-        removeAttrs top [
+        # drop schemes that no longer exist upstream (they throw)
+        lib.filterAttrs (_: drv: (builtins.tryEval drv).success) (removeAttrs top [
           "texlivePackages"
           # needs allowUnfree; exposed via legacyPackages to keep `nix flake check` happy
           "texliveFullUnfree"
-        ]
+        ])
         // {
           default = latest.texliveLatestSmall;
         }
@@ -64,6 +65,7 @@
           texlive = latest.texliveLatest;
           texlivePackages = latest.texliveLatestPackages;
           texliveFullUnfree = latest.texliveLatestFullUnfree;
+          maintainers = import ./lib/maintainers.nix { inherit pkgs latest; };
         }
       );
 

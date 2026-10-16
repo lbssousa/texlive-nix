@@ -140,8 +140,8 @@ let
   version = {
     # day of the snapshot being taken
     year = "2026";
-    month = "07";
-    day = "27";
+    month = "10";
+    day = "15";
     # TeX Live version
     texliveYear = 2026;
     # final (historic) release or snapshot
@@ -182,7 +182,7 @@ let
         # use last mirror for daily snapshots as texlive.tlpdb.xz changes every day
         # TODO make this less hacky
         (if version.final then mirrors else [ (lib.last mirrors) ]);
-    hash = "sha256-7P9cnbSZcWmVW2qlKZkpxr95VI/FllLZ2BDz0xdppBQ=";
+    hash = "sha256-xklQKWqH521+0fPAUu28lQw+PmypA5G6qtnK5UsuF7A=";
   };
 
   tlpdbNix =
@@ -419,7 +419,6 @@ let
       cc-by-20
       cc-by-30
       cc-by-40
-      cc-by-sa-10
       cc-by-sa-20
       cc-by-sa-30
       cc-by-sa-40
@@ -569,7 +568,6 @@ let
       bsd3
       cc-by-30
       cc-by-40
-      cc-by-sa-10
       cc-by-sa-20
       cc-by-sa-30
       cc-by-sa-40
@@ -610,9 +608,13 @@ let
     license = licenses.scheme-infraonly;
   };
 
+  # texlive-nix: schemes come and go between TeX Live releases (e.g.
+  # scheme-bookpub was dropped during TL2026), keep only the existing ones
+  existingSchemes = lib.filter (pname: overriddenTlpdb ? ${pname});
+
   combined = lib.recurseIntoAttrs (
     lib.genAttrs
-      [
+      (existingSchemes [
         "scheme-basic"
         "scheme-bookpub"
         "scheme-context"
@@ -623,7 +625,7 @@ let
         "scheme-minimal"
         "scheme-small"
         "scheme-tetex"
-      ]
+      ])
       (
         pname:
         (buildTeXEnv {
@@ -652,7 +654,7 @@ let
           requiredTeXPackages = ps: [ ps.${"scheme-" + (lib.toLower s)} ];
         });
       })
-      [
+      (lib.filter (s: overriddenTlpdb ? ${"scheme-" + lib.toLower s}) [
         "Basic"
         "BookPub"
         "ConTeXt"
@@ -663,7 +665,7 @@ let
         "Minimal"
         "Small"
         "TeTeX"
-      ]
+      ])
   );
 
 in

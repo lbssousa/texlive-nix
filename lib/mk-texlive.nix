@@ -4,15 +4,7 @@
 # vendored default.nix refers to itself through its `texlive` argument
 # (fixpoint), so it must point back at that attribute.
 final: attr:
-let
-  texliveDir = ../pkgs/texlive;
-  lib = final.lib.extend (
-    _: prev: {
-      licenses = import (texliveDir + "/extra-licenses.nix") { lib = prev; } // prev.licenses;
-    }
-  );
-in
-final.callPackage texliveDir {
-  inherit lib;
+final.callPackage ../pkgs/texlive {
+  lib = import ./extend-lib.nix final.lib;
   texlive = final.${attr};
 }

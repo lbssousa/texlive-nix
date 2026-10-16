@@ -32,7 +32,13 @@ let
   unfreePackages = lib.filter isUnfree (lib.attrValues texlive.pkgs);
 in
 lib.listToAttrs (
-  map (s: lib.nameValuePair (prefix + s) texlive.schemes.${"texlive" + s}) schemes
+  map (
+    s:
+    lib.nameValuePair (prefix + s) (
+      texlive.schemes.${"texlive" + s}
+        or (throw "${prefix + s}: scheme-${lib.toLower s} is not part of this TeX Live release anymore")
+    )
+  ) schemes
 )
 // {
   ${prefix + "FullWithDocs"} = texlive.schemes.texliveFull.overrideAttrs { withDocs = true; };

@@ -19,6 +19,8 @@ let
       self.overlays.additive;
 
   upstreamTests = latest.callPackage ./texlive.nix {
+    # the licenses test maps licenses back to names in lib.licenses
+    lib = import ../lib/extend-lib.nix lib;
     texlive = texliveLatest;
     texliveInfraOnly = latest.texliveLatestInfraOnly;
     texliveConTeXt = latest.texliveLatestConTeXt;
