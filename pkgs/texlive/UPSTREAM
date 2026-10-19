@@ -1,4 +1,4 @@
 # Origin of the vendored files in this directory
-nixpkgs NixOS/nixpkgs fa465a5e1bf7a5d2a5aee6901b8cdfdbb6fd6db0 pkgs/tools/typesetting/tex/texlive
-nixpkgs NixOS/nixpkgs fa465a5e1bf7a5d2a5aee6901b8cdfdbb6fd6db0 pkgs/test/texlive/default.nix -> tests/texlive.nix
+nixpkgs NixOS/nixpkgs ca8dce05e2a77f02717af17b8084ecf8314dae65 pkgs/tools/typesetting/tex/texlive
+nixpkgs NixOS/nixpkgs ca8dce05e2a77f02717af17b8084ecf8314dae65 pkgs/test/texlive/default.nix -> tests/texlive.nix
 chrjabs chrjabs/nixpkgs 445cccfc5e6a36a0aa49d9bd56e372d361c6c1b0 texlive-2026 (merge base 35f54bb45efca845535215cc0437c572003677e3)
